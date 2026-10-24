@@ -1,16 +1,121 @@
-# React + Vite
+# Celebration Planner
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+An accessible planning assistant for **weddings, birthdays and community events**. Enter the event type, date, guest count and budget, and get a budget split, a dated timeline, a vendor checklist and AI-generated ideas.
 
-Currently, two official plugins are available:
+**Live demo:** https://celebration-planner-six.vercel.app
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## What it does
 
-## React Compiler
+| Feature | How it works |
+|---|---|
+| Budget | Splits the total across categories by event type and shows the amount and share for each |
+| Timeline | Works backwards from the event date and gives each task a due date. Tasks that are already late are handled when the date is close |
+| Vendor checklist | Groups vendors by category (venue, caterer, photographer, decorator, entertainment and more) with checkboxes |
+| Ideas | Gemini suggests ideas that fit the event type, guest count, budget and theme. If the AI is unavailable, built-in ideas appear instead |
+| Print | One click prints the plan |
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+The plan itself (budget, timeline, checklist) is calculated by plain, tested JavaScript and never depends on the AI. Only the ideas section does.
 
-## Expanding the ESLint configuration
+## Tech stack
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- **Frontend:** Vite, React 19, plain CSS with light and dark themes
+- **Backend:** one Vercel Function (`api/ideas.js`) that calls Gemini through `@google/genai`
+- **Validation:** Zod for everything the model returns
+- **Quality tools:** Vitest, React Testing Library, vitest-axe, ESLint with `jsx-a11y`, Prettier
+
+## Architecture
+
+```
+Browser (React)
+  |  form values
+  v
+src/planner/*        pure functions: budget, timeline, checklist, buildPlan (validated, tested)
+  |
+  |  POST /api/ideas   (form fields only)
+  v
+api/ideas.js  ->  server/ideas.js   validate input, rate limit, build prompt, validate output
+                  server/gemini.js  Gemini call (key read from the environment)
+```
+
+Design choices:
+
+- **Plan logic is separate from the UI.** The same `buildPlan` validation runs in the browser and on the server, so the two cannot disagree.
+- **The app always works.** If the API fails, times out, is rate limited or returns something unexpected, the client shows built-in ideas and says so.
+- **The API key never reaches the browser.** It is a server-side environment variable.
+
+## Run locally
+
+```bash
+npm install
+npm run dev        # http://localhost:5173
+```
+
+`npm run dev` serves only the front end, so the ideas section shows the built-in ideas. To run the AI endpoint locally as well, use the Vercel CLI (`vercel dev`) with a `GEMINI_API_KEY` set in a local `.env.local` file (git-ignored).
+
+### Environment variables (set on the server, never in the repo)
+
+| Name | Required | Purpose |
+|---|---|---|
+| `GEMINI_API_KEY` | For AI ideas | Google AI Studio key |
+| `GEMINI_MODEL` | No | Overrides the default model without a code change |
+
+### Scripts
+
+| Command | What it does |
+|---|---|
+| `npm run lint` | ESLint, including accessibility rules |
+| `npm test` | Runs the Vitest suite |
+| `npm run build` | Production build |
+| `npm run format` / `format:check` | Prettier |
+
+## Testing
+
+124 tests in 8 files, all passing:
+
+- Budget, timeline, checklist and plan logic, including boundary dates and invalid input
+- The API handler: valid and invalid input, wrong types, oversized bodies, rate limiting, bad or hostile model output, timeouts, and error responses that must not leak details
+- The client service: fallback to built-in ideas on every kind of failure
+- A UI smoke test with an automated axe accessibility check
+
+## Accessibility
+
+- Every field has a visible label, hint text and a linked error message
+- Submitting an invalid form shows an error summary and moves focus to the first invalid field
+- A skip link, semantic landmarks and a visible focus indicator
+- Light and dark themes that follow the system setting, with button and text colors chosen to meet WCAG AA contrast (4.5:1)
+- `eslint-plugin-jsx-a11y` runs on every lint, and `vitest-axe` runs in the tests
+
+**Lighthouse results** (desktop, run on the live site in a clean browser profile):
+
+| Check | Result |
+|---|---|
+| Performance | 100 |
+| Best Practices | 100 |
+| Accessibility, with a generated plan on screen | 100 |
+| Accessibility, empty form | 95 before a contrast fix, since fixed |
+| SEO | 90 before a page description was added; not re-measured |
+
+Automated tools catch only part of the problems. Screen-reader testing has not been done.
+
+## Security
+
+- The Gemini key lives only in a server environment variable
+- Input is type-checked and size-limited (2 KB) and validated with the same rules as the form
+- The model's output is untrusted: it must pass a strict schema (lengths and counts) or it is discarded
+- The user's theme text is sent as quoted data and the system instruction tells the model not to follow instructions inside it
+- Rate limiting per client (10 requests per 10 minutes), a 20 second model timeout, and `store: false` so requests are not kept on the model side
+- Error responses never include model output or internal messages
+- Responses are sent with `Cache-Control: no-store` and `X-Content-Type-Options: nosniff`
+- `.env*` files are git-ignored
+
+## Known limitations
+
+- The rate limiter keeps its counts in memory, so each warm server instance counts separately. This is a best-effort limit, not a hard one. A shared store would be the next step.
+- Budget percentages and timeline offsets are sensible defaults, not advice tuned to a city or a culture
+- Currency is Indian rupees only
+- Plans are not saved. Refreshing the page clears them
+- Ideas depend on a free-tier Gemini quota, and the built-in ideas appear when it is exhausted
+
+## How it was built
+
+Built with AI assistance: Claude helped design and write the planning logic, the server code and the tests, and Google Antigravity generated the first version of the UI components. The code was run, linted and tested by the author.
