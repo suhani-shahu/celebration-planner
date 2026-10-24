@@ -1,6 +1,6 @@
-import { allocateBudget, EVENT_TYPES } from './budget'
-import { generateChecklist } from './checklist'
-import { generateTimeline, todayISO } from './timeline'
+import { allocateBudget, EVENT_TYPES } from './budget.js'
+import { generateChecklist } from './checklist.js'
+import { generateTimeline, todayISO } from './timeline.js'
 
 const MAX_THEME_LENGTH = 60
 

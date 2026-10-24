@@ -1,3 +1,5 @@
+const REQUEST_TIMEOUT_MS = 25000
+
 const OFFLINE_IDEAS = {
   wedding: [
     {
@@ -52,11 +54,8 @@ const OFFLINE_IDEAS = {
   ],
 }
 
-/**
- * Returns event ideas. Offline for now; the AI call will be added here later
- * without changing the shape of the result.
- */
-export async function getIdeas({ eventType, theme = '' }) {
+/** Built-in ideas that work without a network. Throws for an unknown event type. */
+export function getOfflineIdeas({ eventType, theme = '' }) {
   if (!Object.hasOwn(OFFLINE_IDEAS, eventType)) {
     throw new RangeError(`Unknown event type: ${eventType}`)
   }
@@ -70,4 +69,69 @@ export async function getIdeas({ eventType, theme = '' }) {
     })
   }
   return { source: 'offline', ideas }
+}
+
+// Accepts only the expected shape. Anything else is treated as a failed request.
+function isValidIdeas(data) {
+  return (
+    data !== null &&
+    typeof data === 'object' &&
+    Array.isArray(data.ideas) &&
+    data.ideas.length > 0 &&
+    data.ideas.every(
+      (idea) =>
+        idea !== null &&
+        typeof idea === 'object' &&
+        typeof idea.title === 'string' &&
+        typeof idea.description === 'string',
+    )
+  )
+}
+
+/**
+ * Asks the server for AI ideas. If the request fails for any reason (no
+ * server, rate limit, timeout, bad reply) it returns the built-in ideas, so
+ * the plan always has ideas. Rejects only for an unknown event type.
+ */
+export async function getIdeas(
+  input,
+  {
+    fetchFn = (...args) => globalThis.fetch(...args),
+    endpoint = '/api/ideas',
+  } = {},
+) {
+  const offline = getOfflineIdeas(input)
+
+  const controller = new AbortController()
+  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS)
+  try {
+    const response = await fetchFn(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        eventType: input.eventType,
+        eventDate: input.eventDate,
+        guestCount: input.guestCount,
+        budget: input.budget,
+        theme: input.theme,
+      }),
+      signal: controller.signal,
+    })
+    if (!response.ok) return offline
+
+    const data = await response.json()
+    if (!isValidIdeas(data)) return offline
+
+    return {
+      source: 'ai',
+      ideas: data.ideas.map(({ title, description }) => ({
+        title,
+        description,
+      })),
+    }
+  } catch {
+    return offline
+  } finally {
+    clearTimeout(timer)
+  }
 }
