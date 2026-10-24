@@ -66,8 +66,8 @@
     --color-bg: hsl(220, 16%, 12%);
     --color-bg-card: hsl(220, 14%, 18%);
     --color-bg-header: hsl(340, 55%, 16%);
-    --color-accent: hsl(340, 70%, 58%);
-    --color-accent-hover: hsl(340, 70%, 65%);
+    --color-accent: hsl(340, 70%, 70%);
+    --color-accent-hover: hsl(340, 70%, 76%);
     --color-accent-light: hsl(340, 40%, 22%);
     --color-text: hsl(220, 20%, 92%);
     --color-text-muted: hsl(220, 10%, 62%);
@@ -152,7 +152,7 @@ a:hover {
   left: var(--space-2);
   z-index: 1000;
   padding: var(--space-3) var(--space-5);
-  background: var(--color-accent);
+  background: var(--color-btn-primary);
   color: var(--color-text-on-accent);
   border-radius: var(--radius-sm);
   font-weight: 700;
