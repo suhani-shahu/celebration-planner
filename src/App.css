@@ -136,12 +136,12 @@
 }
 
 .btn--primary {
-  background: var(--color-accent);
+  background: var(--color-btn-primary);
   color: var(--color-text-on-accent);
 }
 
 .btn--primary:hover {
-  background: var(--color-accent-hover);
+  background: var(--color-btn-primary-hover);
   box-shadow: 0 4px 12px hsl(340 70% 40% / 0.35);
 }
 

@@ -14,6 +14,8 @@
   --color-text: hsl(220, 15%, 15%);
   --color-text-muted: hsl(220, 10%, 40%);
   --color-text-on-accent: hsl(0, 0%, 100%);
+  --color-btn-primary: hsl(340, 70%, 42%);
+  --color-btn-primary-hover: hsl(340, 70%, 35%);
   --color-border: hsl(220, 15%, 85%);
   --color-error: hsl(0, 70%, 40%);
   --color-error-bg: hsl(0, 80%, 96%);
