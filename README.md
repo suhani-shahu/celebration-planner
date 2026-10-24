@@ -9,7 +9,7 @@ An accessible planning assistant for **weddings, birthdays and community events*
 | Feature          | How it works                                                                                                                          |
 | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
 | Budget           | Splits the total across categories by event type and shows the amount and share for each                                              |
-| Timeline         | Works backwards from the event date and gives each task a due date. Tasks that are already late are handled when the date is close    |
+| Timeline         | Works backwards from the event date and gives each task a due date. Tasks that are already past due are flagged as overdue            |
 | Vendor checklist | Groups vendors by category (venue, caterer, photographer, decorator, entertainment and more) with checkboxes                          |
 | Ideas            | Gemini suggests ideas that fit the event type, guest count, budget and theme. If the AI is unavailable, built-in ideas appear instead |
 | Print            | One click prints the plan                                                                                                             |
@@ -75,7 +75,7 @@ npm run dev        # http://localhost:5173
 - Budget, timeline, checklist and plan logic, including boundary dates and invalid input
 - The API handler: valid and invalid input, wrong types, oversized bodies, rate limiting, bad or hostile model output, timeouts, and error responses that must not leak details
 - The client service: fallback to built-in ideas on every kind of failure
-- A UI smoke test with an automated axe accessibility check
+- A toolchain smoke test (a placeholder component checked with axe). Tests of the real UI components are not written yet.
 
 ## Accessibility
 
@@ -83,7 +83,7 @@ npm run dev        # http://localhost:5173
 - Submitting an invalid form shows an error summary and moves focus to the first invalid field
 - A skip link, semantic landmarks and a visible focus indicator
 - Light and dark themes that follow the system setting, with button and text colors chosen to meet WCAG AA contrast (4.5:1)
-- `eslint-plugin-jsx-a11y` runs on every lint, and `vitest-axe` runs in the tests
+- `eslint-plugin-jsx-a11y` runs on every lint.
 
 **Lighthouse results** (desktop, run on the live site in a clean browser profile):
 
