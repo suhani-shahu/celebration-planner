@@ -16,6 +16,23 @@ An accessible planning assistant for **weddings, birthdays and community events*
 
 The plan itself (budget, timeline, checklist) is calculated by plain, tested JavaScript and never depends on the AI. Only the ideas section does.
 
+## Chosen vertical
+
+**Celebration & Event Planner** for three event types: weddings, birthdays and community events. The user is an individual or a small organising committee who needs a clear plan without a paid planner.
+
+## Approach and assumptions
+
+The assistant makes its decisions from the user's context: the event type decides the budget split, the milestones and the vendor checklist; the date decides which tasks are already overdue; the guest count and budget are validated and passed on to the ideas request.
+
+Assumptions made:
+
+- Budget splits are fixed percentages per event type, for example 30% venue and 30% catering for a wedding. They are sensible defaults, not quotes from real vendors.
+- Timeline milestones are fixed "days before the event" offsets per event type, for example booking the venue 150 days before a wedding.
+- The event date must be today or later. Guests must be a whole number from 1 to 10,000, and the budget a whole amount from 1,000 to 1,000,000,000 rupees.
+- Theme text is optional and limited to 60 characters.
+- All amounts are in Indian rupees, and one user plans one event at a time.
+- The ideas are suggestions from an AI model and have not been checked by a human. The rest of the plan does not depend on them.
+
 ## Tech stack
 
 - **Frontend:** Vite, React 19, plain CSS with light and dark themes
