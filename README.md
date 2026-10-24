@@ -6,13 +6,13 @@ An accessible planning assistant for **weddings, birthdays and community events*
 
 ## What it does
 
-| Feature | How it works |
-|---|---|
-| Budget | Splits the total across categories by event type and shows the amount and share for each |
-| Timeline | Works backwards from the event date and gives each task a due date. Tasks that are already late are handled when the date is close |
-| Vendor checklist | Groups vendors by category (venue, caterer, photographer, decorator, entertainment and more) with checkboxes |
-| Ideas | Gemini suggests ideas that fit the event type, guest count, budget and theme. If the AI is unavailable, built-in ideas appear instead |
-| Print | One click prints the plan |
+| Feature          | How it works                                                                                                                          |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| Budget           | Splits the total across categories by event type and shows the amount and share for each                                              |
+| Timeline         | Works backwards from the event date and gives each task a due date. Tasks that are already late are handled when the date is close    |
+| Vendor checklist | Groups vendors by category (venue, caterer, photographer, decorator, entertainment and more) with checkboxes                          |
+| Ideas            | Gemini suggests ideas that fit the event type, guest count, budget and theme. If the AI is unavailable, built-in ideas appear instead |
+| Print            | One click prints the plan                                                                                                             |
 
 The plan itself (budget, timeline, checklist) is calculated by plain, tested JavaScript and never depends on the AI. Only the ideas section does.
 
@@ -54,19 +54,19 @@ npm run dev        # http://localhost:5173
 
 ### Environment variables (set on the server, never in the repo)
 
-| Name | Required | Purpose |
-|---|---|---|
-| `GEMINI_API_KEY` | For AI ideas | Google AI Studio key |
-| `GEMINI_MODEL` | No | Overrides the default model without a code change |
+| Name             | Required     | Purpose                                           |
+| ---------------- | ------------ | ------------------------------------------------- |
+| `GEMINI_API_KEY` | For AI ideas | Google AI Studio key                              |
+| `GEMINI_MODEL`   | No           | Overrides the default model without a code change |
 
 ### Scripts
 
-| Command | What it does |
-|---|---|
-| `npm run lint` | ESLint, including accessibility rules |
-| `npm test` | Runs the Vitest suite |
-| `npm run build` | Production build |
-| `npm run format` / `format:check` | Prettier |
+| Command                           | What it does                          |
+| --------------------------------- | ------------------------------------- |
+| `npm run lint`                    | ESLint, including accessibility rules |
+| `npm test`                        | Runs the Vitest suite                 |
+| `npm run build`                   | Production build                      |
+| `npm run format` / `format:check` | Prettier                              |
 
 ## Testing
 
@@ -87,13 +87,13 @@ npm run dev        # http://localhost:5173
 
 **Lighthouse results** (desktop, run on the live site in a clean browser profile):
 
-| Check | Result |
-|---|---|
-| Performance | 100 |
-| Best Practices | 100 |
-| Accessibility, with a generated plan on screen | 100 |
-| Accessibility, empty form | 95 before a contrast fix, since fixed |
-| SEO | 90 before a page description was added; not re-measured |
+| Check                                          | Result                                                  |
+| ---------------------------------------------- | ------------------------------------------------------- |
+| Performance                                    | 100                                                     |
+| Best Practices                                 | 100                                                     |
+| Accessibility, with a generated plan on screen | 100                                                     |
+| Accessibility, empty form                      | 95 before a contrast fix, since fixed                   |
+| SEO                                            | 90 before a page description was added; not re-measured |
 
 Automated tools catch only part of the problems. Screen-reader testing has not been done.
 
