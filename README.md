@@ -38,7 +38,7 @@ Assumptions made:
 - **Frontend:** Vite, React 19, plain CSS with light and dark themes
 - **Backend:** one Vercel Function (`api/ideas.js`) that calls Gemini through `@google/genai`
 - **Validation:** Zod for everything the model returns
-- **Quality tools:** Vitest, React Testing Library, vitest-axe, ESLint with `jsx-a11y`, Prettier
+- **Quality tools:** Vitest with V8 coverage, React Testing Library, vitest-axe, ESLint with `jsx-a11y`, Prettier, GitHub Actions
 
 ## Architecture
 
@@ -82,17 +82,23 @@ npm run dev        # http://localhost:5173
 | --------------------------------- | ------------------------------------- |
 | `npm run lint`                    | ESLint, including accessibility rules |
 | `npm test`                        | Runs the Vitest suite                 |
+| `npm run test:coverage`           | Runs the tests with a coverage report |
 | `npm run build`                   | Production build                      |
 | `npm run format` / `format:check` | Prettier                              |
 
 ## Testing
 
-124 tests in 8 files, all passing:
+155 tests in 17 files, all passing. Coverage from `npm run test:coverage` (V8): 97.9% of lines, 96.7% of statements, 96.4% of functions and 90.3% of branches. The run fails if coverage drops below 90% (85% for branches).
 
 - Budget, timeline, checklist and plan logic, including boundary dates and invalid input
 - The API handler: valid and invalid input, wrong types, oversized bodies, rate limiting, bad or hostile model output, timeouts, and error responses that must not leak details
 - The client service: fallback to built-in ideas on every kind of failure
-- A toolchain smoke test (a placeholder component checked with axe). Tests of the real UI components are not written yet.
+- The real app, rendered end to end with a mocked server: validation errors and focus, a full plan, the built-in ideas fallback, overdue milestones, the checklist counter, ignoring a slow earlier reply, and the print button
+- Each UI component on its own (budget table, timeline, checklist, ideas panel, result card)
+- A regression test for a bug these tests found: creating a second plan for a different event type used to crash the checklist
+- `axe` accessibility checks on the real app: empty form, form with errors, and a full plan
+
+GitHub Actions (`.github/workflows/ci.yml`) runs lint, format check, tests with coverage, the build and a production dependency audit on every push to `main`.
 
 ## Accessibility
 
@@ -100,7 +106,9 @@ npm run dev        # http://localhost:5173
 - Submitting an invalid form shows an error summary and moves focus to the first invalid field
 - A skip link, semantic landmarks and a visible focus indicator
 - Light and dark themes that follow the system setting, with button and text colors chosen to meet WCAG AA contrast (4.5:1)
-- `eslint-plugin-jsx-a11y` runs on every lint.
+- `eslint-plugin-jsx-a11y` runs on every lint, and `vitest-axe` checks the real app in the tests
+- AI-generated ideas are labelled as AI-generated, so users know to review them
+- Printed plans show empty checkboxes that can be ticked by hand
 
 **Lighthouse results** (desktop, run on the live site in a clean browser profile):
 
@@ -112,7 +120,7 @@ npm run dev        # http://localhost:5173
 | Accessibility, empty form                      | 95 before a contrast fix, since fixed                   |
 | SEO                                            | 90 before a page description was added; not re-measured |
 
-Automated tools catch only part of the problems. Screen-reader testing has not been done.
+The Lighthouse numbers were measured before the latest UI changes (checkbox alignment, labels) and have not been re-run. Automated tools catch only part of the problems. Screen-reader testing has not been done.
 
 ## Security
 

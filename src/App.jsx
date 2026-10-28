@@ -8,20 +8,13 @@ import BudgetTable from './components/BudgetTable'
 import Timeline from './components/Timeline'
 import Checklist from './components/Checklist'
 import IdeasPanel from './components/IdeasPanel'
+import ResultCard from './components/ResultCard'
 import { formatINR } from './utils/formatCurrency'
+import { formatDisplayDate } from './utils/formatDate'
+import { capitalize } from './utils/text'
 import './App.css'
 
 const FIELD_ORDER = ['eventType', 'eventDate', 'guestCount', 'budget', 'theme']
-
-// Formats an ISO date string as "12 Mar 2027" for the summary line.
-function formatSummaryDate(isoDate) {
-  return new Date(isoDate + 'T00:00:00Z').toLocaleDateString('en-IN', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-    timeZone: 'UTC',
-  })
-}
 
 export default function App() {
   const today = todayISO()
@@ -29,6 +22,8 @@ export default function App() {
 
   const [formErrors, setFormErrors] = useState(null)
   const [plan, setPlan] = useState(null)
+  // Changes with every new plan so per-plan state (like ticked checklist items) starts fresh
+  const [planVersion, setPlanVersion] = useState(0)
 
   // Ideas state
   const [ideasStatus, setIdeasStatus] = useState('idle') // idle | loading | done | error
@@ -69,6 +64,7 @@ export default function App() {
 
     setFormErrors(null)
     setPlan(result.plan)
+    setPlanVersion((version) => version + 1)
 
     // Focus the results heading
     requestAnimationFrame(() => {
@@ -138,47 +134,26 @@ export default function App() {
 
             {/* Summary line */}
             <p className="results-section__summary">
-              <strong>
-                {plan.input.eventType.charAt(0).toUpperCase() +
-                  plan.input.eventType.slice(1)}
-              </strong>{' '}
-              on <strong>{formatSummaryDate(plan.input.eventDate)}</strong> for{' '}
+              <strong>{capitalize(plan.input.eventType)}</strong> on{' '}
+              <strong>{formatDisplayDate(plan.input.eventDate)}</strong> for{' '}
               <strong>{plan.input.guestCount}</strong> guests · Budget{' '}
               <strong>{formatINR(plan.input.budget)}</strong>
             </p>
 
             {/* Budget */}
-            <section
-              className="result-card"
-              aria-labelledby="budget-section-heading"
-            >
-              <h3 id="budget-section-heading" className="section-heading">
-                Budget
-              </h3>
+            <ResultCard id="budget-section" title="Budget">
               <BudgetTable rows={plan.budget} total={totalBudget} />
-            </section>
+            </ResultCard>
 
             {/* Timeline */}
-            <section
-              className="result-card"
-              aria-labelledby="timeline-section-heading"
-            >
-              <h3 id="timeline-section-heading" className="section-heading">
-                Timeline
-              </h3>
+            <ResultCard id="timeline-section" title="Timeline">
               <Timeline items={plan.timeline} />
-            </section>
+            </ResultCard>
 
             {/* Vendor checklist */}
-            <section
-              className="result-card"
-              aria-labelledby="checklist-section-heading"
-            >
-              <h3 id="checklist-section-heading" className="section-heading">
-                Vendor checklist
-              </h3>
-              <Checklist vendors={plan.checklist} />
-            </section>
+            <ResultCard id="checklist-section" title="Vendor checklist">
+              <Checklist key={planVersion} vendors={plan.checklist} />
+            </ResultCard>
 
             {/* Ideas */}
             <div className="result-card">

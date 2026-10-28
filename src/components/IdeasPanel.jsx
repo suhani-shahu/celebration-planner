@@ -30,6 +30,11 @@ export default function IdeasPanel({ status, ideas, source, onRetry }) {
           {source === 'offline' && (
             <p className="ideas-panel__source-note">Showing built-in ideas</p>
           )}
+          {source === 'ai' && (
+            <p className="ideas-panel__source-note">
+              AI-generated ideas (Gemini). Please review before using them.
+            </p>
+          )}
           <ul className="ideas-panel__list">
             {ideas.map((idea) => (
               <li key={idea.title} className="ideas-panel__card">

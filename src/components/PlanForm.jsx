@@ -1,6 +1,7 @@
 // Renders the event planning form with full validation feedback and accessibility.
 import { useId } from 'react'
 import { EVENT_TYPES } from '../planner/budget'
+import { capitalize } from '../utils/text'
 
 const FIELD_ORDER = ['eventType', 'eventDate', 'guestCount', 'budget', 'theme']
 
@@ -71,7 +72,7 @@ export function PlanFormFields({ baseId, today, errors, onSubmit }) {
           <option value="">Choose an event type</option>
           {EVENT_TYPES.map((t) => (
             <option key={t} value={t}>
-              {t.charAt(0).toUpperCase() + t.slice(1)}
+              {capitalize(t)}
             </option>
           ))}
         </select>
@@ -151,10 +152,7 @@ export function PlanFormFields({ baseId, today, errors, onSubmit }) {
       {/* Theme (optional) */}
       <div className="plan-form__group">
         <label className="plan-form__label" htmlFor={id('theme')}>
-          Theme{' '}
-          <span className="plan-form__optional" aria-label="optional">
-            (optional)
-          </span>
+          Theme <span className="plan-form__optional">(optional)</span>
         </label>
         <input
           type="text"

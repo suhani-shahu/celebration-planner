@@ -1,5 +1,6 @@
 // Renders a budget allocation as an accessible table with category, share and amount columns.
 import { formatINR } from '../utils/formatCurrency'
+import { capitalize } from '../utils/text'
 
 export default function BudgetTable({ rows, total }) {
   return (
@@ -16,9 +17,7 @@ export default function BudgetTable({ rows, total }) {
         <tbody>
           {rows.map((row) => (
             <tr key={row.category}>
-              <th scope="row">
-                {row.category.charAt(0).toUpperCase() + row.category.slice(1)}
-              </th>
+              <th scope="row">{capitalize(row.category)}</th>
               <td>{row.percent}%</td>
               <td>{formatINR(row.amount)}</td>
             </tr>

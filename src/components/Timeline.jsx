@@ -1,12 +1,5 @@
 // Renders an ordered list of planning milestones with due dates and overdue badges.
-function formatDate(isoDate) {
-  return new Date(isoDate + 'T00:00:00Z').toLocaleDateString('en-IN', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-    timeZone: 'UTC',
-  })
-}
+import { formatDisplayDate } from '../utils/formatDate'
 
 export default function Timeline({ items }) {
   return (
@@ -14,7 +7,9 @@ export default function Timeline({ items }) {
       {items.map((item) => (
         <li key={item.task} className="timeline__item">
           <span className="timeline__task">{item.task}</span>
-          <span className="timeline__due">Due: {formatDate(item.dueDate)}</span>
+          <span className="timeline__due">
+            Due: {formatDisplayDate(item.dueDate)}
+          </span>
           {item.overdue && (
             <span className="timeline__badge timeline__badge--overdue">
               Overdue
